@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: n-news-service
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/n-news-service
+    username: postgres
+    password: mitrandir
+
+server:
+  port: 8082
