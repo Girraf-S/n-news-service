@@ -10,7 +10,11 @@ spring:
     url: jdbc:postgresql://localhost:5432/n-news-service
     username: postgres
     password: mitrandir
+<<<<<<< HEAD
 jwt:
   key: Nikon1234
+=======
+
+>>>>>>> origin/feature/P-3-Configuration
 server:
   port: 8082
