@@ -4,7 +4,6 @@ import com.solbeg.nnewsservice.model.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -15,7 +14,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private RestTemplate restTemplate;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) {
         return getUserFromJson(username);
     }
 
@@ -23,5 +22,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return restTemplate.getForObject("http://localhost:8081/auth/users/{username}",
                 UserDetailsImpl.class, username);
     }
+
 }
 
