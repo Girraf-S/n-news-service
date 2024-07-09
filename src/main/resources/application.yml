@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: n-news-service
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    open-in-view: false
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/n-news-service
+    username: postgres
+    password: mitrandir
+
+jwt:
+  key: Nikon1234
+
+server:
+  port: 8082
