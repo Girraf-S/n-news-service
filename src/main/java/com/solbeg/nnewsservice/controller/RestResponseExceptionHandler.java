@@ -12,20 +12,20 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class RestResponseExceptionHandler {
 
-    @ExceptionHandler(HeaderException.class)
-    @AfterThrowing(pointcut = "execution(* com.solbeg.nuserservice.controller.*.*(..))", throwing = "HeaderException")
-    public ResponseEntity<Response> handleConflict(
-            HeaderException ex) {
-        Response response = new Response(ex.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler(RuntimeException.class)
-    @AfterThrowing(pointcut = "execution(* com.solbeg.nuserservice.controller.*.*(..))", throwing = "HeaderException")
-    public ResponseEntity<Response> handleConflict(
-            RuntimeException ex) {
-        Response response = new Response(ex.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+//    @ExceptionHandler(HeaderException.class)
+//    @AfterThrowing(pointcut = "execution(* com.solbeg.nuserservice.controller.*.*(..))", throwing = "HeaderException")
+//    public ResponseEntity<Response> handleConflict(
+//            HeaderException ex) {
+//        Response response = new Response(ex.getMessage());
+//        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+//    }
+//
+//    @ExceptionHandler(RuntimeException.class)
+//    @AfterThrowing(pointcut = "execution(* com.solbeg.nuserservice.controller.*.*(..))", throwing = "HeaderException")
+//    public ResponseEntity<Response> handleConflict(
+//            RuntimeException ex) {
+//        Response response = new Response(ex.getMessage());
+//        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+//    }
 
 }

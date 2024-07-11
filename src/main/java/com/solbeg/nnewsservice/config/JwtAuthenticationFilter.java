@@ -1,13 +1,14 @@
 package com.solbeg.nnewsservice.config;
 
 import com.solbeg.nnewsservice.exception.HeaderException;
-import com.solbeg.nnewsservice.model.UserDetailsImpl;
+import com.solbeg.nnewsservice.security.UserDetailsImpl;
 import com.solbeg.nnewsservice.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -29,14 +30,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final RestTemplate restTemplate;
+    @Value("${jwt.bearer}")
+    private String bearer;
+    @Value("${jwt.begin-index}")
+    private int beginIndex;
 
-    private void setAuthenticationIfTokenValid(HttpServletRequest request, String username, String jwt) {
-        UserDetails user = restTemplate.exchange("http://localhost:8081/auth/users", HttpMethod.POST,
-                new HttpEntity<>(new HttpHeaders() {{
-                    set(HttpHeaders.AUTHORIZATION,"Bearer "+ jwt);
-                }}), UserDetailsImpl.class, username).getBody();
-
+    private UserDetailsImpl findUserByToken(String jwt) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.AUTHORIZATION, bearer + jwt);
+        UserDetailsImpl user = restTemplate.exchange("http://localhost:8081/auth/users", HttpMethod.POST,
+                new HttpEntity<>(headers), UserDetailsImpl.class).getBody();
         Objects.requireNonNull(user);
+        user.setAuthorities(jwtService.extractAuthorities(jwt));
+        return user;
+    }
+
+    private void setAuthenticationIfTokenValid(HttpServletRequest request, String jwt) {
+        UserDetails user = findUserByToken(jwt);
         if (jwtService.isTokenValid(jwt, user.getUsername())) {
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                     user,
@@ -56,19 +66,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
-        final String authHeader = request.getHeader("Authorization");
+        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         final String jwt;
-        final String username;
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || !authHeader.startsWith(bearer)) {
             throw new HeaderException("Header should be started with 'Bearer'");
         }
-        jwt = authHeader.substring(7);
-        username = jwtService.extractUsername(jwt);
+        jwt = authHeader.substring(beginIndex);
 
-        Objects.requireNonNull(username);
-        setAuthenticationIfTokenValid(request, username, jwt);
-        response.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + jwt);
+        setAuthenticationIfTokenValid(request, jwt);
+        response.setHeader(HttpHeaders.AUTHORIZATION, bearer + jwt);
         filterChain.doFilter(request, response);
     }
 }
