@@ -31,4 +31,7 @@ public class News {
     @Column(nullable = false)
     private String text;
 
+    @Column(nullable = false)
+    private Long userId;
+
 }
