@@ -2,6 +2,7 @@ package com.solbeg.nnewsservice.mapper;
 
 import com.solbeg.nnewsservice.entity.News;
 import com.solbeg.nnewsservice.model.NewsRequest;
+import com.solbeg.nnewsservice.model.NewsResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -9,10 +10,9 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface NewsMapper {
     @Mapping(target = "time", ignore = true)
-    News newsFromNewsRequest(NewsRequest newsRequest);
+    News newsFromNewsRequest(NewsRequest newsRequest, Long userId);
     @Mapping(target = "time", ignore = true)
-    News updateNewsFromNewsRequest(NewsRequest newsRequest, @MappingTarget News news);
+    News update(@MappingTarget News news, NewsRequest newsRequest);
 
-
-    NewsRequest newsRequestFromNews(News news);
+    NewsResponse toResponse(News news);
 }

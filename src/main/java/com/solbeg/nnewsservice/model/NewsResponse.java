@@ -1,16 +1,19 @@
 package com.solbeg.nnewsservice.model;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class NewsRequest {
-    @NotNull
+@NoArgsConstructor
+@Builder
+public class NewsResponse {
+    private Long id;
+    private LocalDateTime time;
     private String title;
-    @NotNull
     private String text;
 }

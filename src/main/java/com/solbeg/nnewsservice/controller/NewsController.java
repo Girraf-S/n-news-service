@@ -1,13 +1,11 @@
 package com.solbeg.nnewsservice.controller;
 
-import com.solbeg.nnewsservice.entity.News;
 import com.solbeg.nnewsservice.model.NewsRequest;
+import com.solbeg.nnewsservice.model.NewsResponse;
 import com.solbeg.nnewsservice.service.NewsService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,32 +18,26 @@ public class NewsController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('news:read')")
-    public News getNewsById(@PathVariable Long id) {
-        return newsService.readNews(id);
+    public NewsResponse getNewsById(@PathVariable Long id) {
+        return newsService.getNewsById(id);
     }
 
     @PostMapping
     @PreAuthorize("hasAuthority('news:write')")
-    public void createNews(@RequestBody NewsRequest newsRequest,
-                           HttpServletRequest request) {
-        newsService.createNews(newsRequest, request);
+    public void createNews(@RequestBody NewsRequest newsRequest) {
+        newsService.createNews(newsRequest);
     }
 
     @PatchMapping("/{id}")
     @PreAuthorize("hasAuthority('news:write')")
     public void updateNews(@PathVariable Long id,
-                           @RequestBody NewsRequest newsRequest,
-                           HttpServletRequest request) {
-        newsService.updateNews(newsRequest,request, id);
+                           @RequestBody NewsRequest newsRequest){
+        newsService.updateNews(newsRequest, id);
     }
     
     @GetMapping
     @PreAuthorize("hasAuthority('news:read')")
-    public Page<News> readAll(
-            @RequestParam(value = "offset", defaultValue = "0") @Min(0) Integer offset,
-            @RequestParam(value = "limit", defaultValue = "5") @Min(1) @Max(10)Integer limit
-    ){
-        return newsService.readAll(offset, limit);
+    public Page<NewsResponse> getAllNews(Pageable pageable) {
+        return newsService.getAllNews(pageable);
     }
-
 }

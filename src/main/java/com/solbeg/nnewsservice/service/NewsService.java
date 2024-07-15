@@ -3,14 +3,15 @@ package com.solbeg.nnewsservice.service;
 import com.solbeg.nnewsservice.entity.News;
 import com.solbeg.nnewsservice.mapper.NewsMapper;
 import com.solbeg.nnewsservice.model.NewsRequest;
+import com.solbeg.nnewsservice.model.NewsResponse;
 import com.solbeg.nnewsservice.repository.NewsRepository;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpHeaders;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
@@ -19,41 +20,51 @@ import java.util.Objects;
 public class NewsService {
     private final NewsRepository newsRepository;
     private final NewsMapper newsMapper;
-    private final JwtService jwtService;
 
-    public void createNews(NewsRequest newsRequest, HttpServletRequest request) {
-        Long userId = jwtService.extractId(
-                jwtService.getJwtOrThrowException(
-                        request.getHeader(HttpHeaders.AUTHORIZATION)
-                ));
-        News news = newsMapper.newsFromNewsRequest(newsRequest);
-        news.setUserId(userId);
+    @Transactional
+    public void createNews(NewsRequest newsRequest) {
+        News news = newsMapper.newsFromNewsRequest(newsRequest, getUserIdFromSecurityContext());
+
         newsRepository.save(news);
     }
 
-    public void updateNews(NewsRequest newsRequest, HttpServletRequest request, Long id) {
-        String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-        System.out.println();
-        System.out.println(header);
-        System.out.println();
-        Long userId = jwtService.extractId(
-                jwtService.getJwtOrThrowException(
-                        header
-                ));
-        News news = readNews(id);
-        if (!Objects.equals(userId, news.getUserId()))
-            throw new AccessDeniedException("Only creator can update news");
+    @Transactional
+    public void updateNews(NewsRequest newsRequest, Long id) {
+        News news = getNewsByIdOrThrowException(id);
 
-        newsRepository.save(newsMapper.updateNewsFromNewsRequest(newsRequest, news));
+        validate(news);
+
+        news  = newsMapper.update(news, newsRequest);
+
+        newsRepository.save(news);
     }
 
-    public News readNews(Long id) {
+    @Transactional(readOnly = true)
+    public NewsResponse getNewsById(Long id) {
+        News news = getNewsByIdOrThrowException(id);
+        return newsMapper.toResponse(news);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<NewsResponse> getAllNews(Pageable pageable) {
+        return newsRepository.findAll(pageable).map(newsMapper::toResponse);
+    }
+
+    private News getNewsByIdOrThrowException(Long id) {
         return newsRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("No news with id " + id)
         );
     }
 
-    public Page<News> readAll(int offset, int limit) {
-        return newsRepository.findAll(PageRequest.of(offset, limit));
+    private static void validate(final News news) {
+        final Long userIdFromSecurityContext = getUserIdFromSecurityContext();
+        if (!Objects.equals(userIdFromSecurityContext, news.getUserId()))
+            throw new AccessDeniedException("Only creator can update news");
+    }
+
+    private static Long getUserIdFromSecurityContext() {
+        return Long.parseLong(
+                AuthUtil.extractClaimStringValue(SecurityContextHolder.getContext().getAuthentication(), "id")
+        );
     }
 }

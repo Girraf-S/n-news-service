@@ -19,3 +19,8 @@ jwt:
 
 server:
   port: 8082
+service:
+  user-domain: http://localhost:8081
+
+
+
