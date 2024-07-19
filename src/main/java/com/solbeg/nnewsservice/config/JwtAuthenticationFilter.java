@@ -1,6 +1,6 @@
 package com.solbeg.nnewsservice.config;
 
-import com.solbeg.nnewsservice.exception.HeaderException;
+import com.solbeg.nnewsservice.exception.AppException;
 import com.solbeg.nnewsservice.security.UserDetailsImpl;
 import com.solbeg.nnewsservice.service.AuthUtil;
 import com.solbeg.nnewsservice.service.JwtService;
@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -46,7 +47,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String jwt;
 
         if (authHeader == null || !authHeader.startsWith(bearer)) {
-            throw new HeaderException("Header should be started with 'Bearer'");
+            throw new AppException("Header should be started with 'Bearer'", HttpStatus.INTERNAL_SERVER_ERROR);
         }
         jwt = authHeader.substring(beginIndex);
 

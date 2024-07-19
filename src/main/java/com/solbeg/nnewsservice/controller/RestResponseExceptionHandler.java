@@ -1,6 +1,6 @@
 package com.solbeg.nnewsservice.controller;
 
-import com.solbeg.nnewsservice.exception.HeaderException;
+import com.solbeg.nnewsservice.exception.AppException;
 import com.solbeg.nnewsservice.model.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,14 +10,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class RestResponseExceptionHandler {
 
-    @ExceptionHandler(HeaderException.class)
+    @ExceptionHandler(AppException.class)
     public ResponseEntity<ErrorResponse> handleConflict(
-            HeaderException ex) {
+            AppException ex) {
         ErrorResponse response = new ErrorResponse(ex.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(response, ex.getHttpStatus());
     }
 
-    @ExceptionHandler(RuntimeException.class)
+    @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleConflict(
             RuntimeException ex) {
         ErrorResponse response = new ErrorResponse(ex.getMessage());
