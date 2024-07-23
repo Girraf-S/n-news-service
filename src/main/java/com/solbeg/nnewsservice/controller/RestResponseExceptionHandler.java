@@ -1,9 +1,7 @@
 package com.solbeg.nnewsservice.controller;
 
-
-import com.solbeg.nnewsservice.exception.HeaderException;
-import com.solbeg.nnewsservice.model.Response;
-import org.aspectj.lang.annotation.AfterThrowing;
+import com.solbeg.nnewsservice.exception.AppException;
+import com.solbeg.nnewsservice.model.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -12,19 +10,17 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class RestResponseExceptionHandler {
 
-    @ExceptionHandler(HeaderException.class)
-    @AfterThrowing(pointcut = "execution(* com.solbeg.nuserservice.controller.*.*(..))", throwing = "HeaderException")
-    public ResponseEntity<Response> handleConflict(
-            HeaderException ex) {
-        Response response = new Response(ex.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    @ExceptionHandler(AppException.class)
+    public ResponseEntity<ErrorResponse> handleConflict(
+            AppException ex) {
+        ErrorResponse response = new ErrorResponse(ex.getMessage());
+        return new ResponseEntity<>(response, ex.getHttpStatus());
     }
 
-    @ExceptionHandler(RuntimeException.class)
-    @AfterThrowing(pointcut = "execution(* com.solbeg.nuserservice.controller.*.*(..))", throwing = "HeaderException")
-    public ResponseEntity<Response> handleConflict(
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleConflict(
             RuntimeException ex) {
-        Response response = new Response(ex.getMessage());
+        ErrorResponse response = new ErrorResponse(ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

@@ -14,6 +14,13 @@ spring:
 
 jwt:
   key: Nikon1234
+  bearer: 'Bearer '
+  begin-index: 7
 
 server:
   port: 8082
+service:
+  user-domain: http://localhost:8081
+
+
+

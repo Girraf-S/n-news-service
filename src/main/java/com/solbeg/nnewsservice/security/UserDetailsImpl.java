@@ -1,6 +1,7 @@
-package com.solbeg.nnewsservice.model;
+package com.solbeg.nnewsservice.security;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.solbeg.nnewsservice.security.deserializer.UserDetailsImplDeserializer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

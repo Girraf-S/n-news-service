@@ -1,9 +1,10 @@
-package com.solbeg.nnewsservice.model;
+package com.solbeg.nnewsservice.security.deserializer;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.solbeg.nnewsservice.security.UserDetailsImpl;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.io.IOException;
@@ -15,16 +16,9 @@ public class UserDetailsImplDeserializer extends JsonDeserializer<UserDetailsImp
     public UserDetailsImpl deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException{
         JsonNode jsonNode = jsonParser.getCodec().readTree(jsonParser);
         String username = jsonNode.get("username").asText();
-        String password = "********";//jsonNode.get("password").asText();
+        String password = "********";
         boolean active = jsonNode.get("active").asBoolean();
         Set<SimpleGrantedAuthority> authorities = new HashSet<>();
-        JsonNode arrNode = jsonNode.get("authorities");
-        if(arrNode.isArray()){
-            for (JsonNode objNode:
-                    arrNode) {
-                authorities.add(new SimpleGrantedAuthority(objNode.get("authority").asText()));
-            }
-        }
 
         return UserDetailsImpl.builder()
                 .username(username)
