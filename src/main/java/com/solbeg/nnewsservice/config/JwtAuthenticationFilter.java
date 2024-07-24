@@ -59,7 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private UserDetailsImpl findUserByToken(String jwt) {
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, bearer + jwt);
-        UserDetailsImpl user = restTemplate.exchange(userDomain + "/auth/users", HttpMethod.POST,
+        UserDetailsImpl user = restTemplate.exchange(userDomain + "/account", HttpMethod.POST,
                 new HttpEntity<>(headers), UserDetailsImpl.class).getBody();
         Objects.requireNonNull(user);
         user.setAuthorities(AuthUtil.extractClaimAuthorities(SecurityContextHolder.getContext().getAuthentication()));

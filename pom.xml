@@ -133,6 +133,26 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>ch.acanda.maven</groupId>
+                <artifactId>spring-banner-plugin</artifactId>
+                <version>1.5.2</version>
+                <executions>
+                    <execution>
+                        <id>generate-spring-banner</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <filename>banner.txt</filename>
+                    <includeInfo>true</includeInfo>
+                    <font>standard</font>
+                    <color>green</color>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
