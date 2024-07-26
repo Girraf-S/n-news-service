@@ -18,7 +18,7 @@ jwt:
   begin-index: 7
 
 server:
-  port: 8082
+  port: 8085
 service:
   user-domain: http://localhost:8081
 

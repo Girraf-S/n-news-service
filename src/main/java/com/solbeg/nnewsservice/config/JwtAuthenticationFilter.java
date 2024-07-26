@@ -2,7 +2,6 @@ package com.solbeg.nnewsservice.config;
 
 import com.solbeg.nnewsservice.exception.AppException;
 import com.solbeg.nnewsservice.security.UserDetailsImpl;
-import com.solbeg.nnewsservice.service.AuthUtil;
 import com.solbeg.nnewsservice.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -16,6 +15,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -23,7 +23,10 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -56,13 +59,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    private Set<SimpleGrantedAuthority> extractClaimAuthority(String jwt){
+        var claim = jwtService.extractClaims(jwt).get("authorities");
+        if(claim instanceof List){
+            @SuppressWarnings("unchecked")
+            List<String> authorities = (List<String>) claim;
+            return authorities.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toSet());
+        }
+        throw new AppException("No claim with name authorities", HttpStatus.BAD_REQUEST);
+    }
+
     private UserDetailsImpl findUserByToken(String jwt) {
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, bearer + jwt);
-        UserDetailsImpl user = restTemplate.exchange(userDomain + "/account", HttpMethod.POST,
+        UserDetailsImpl user = restTemplate.exchange(userDomain + "/account", HttpMethod.GET,
                 new HttpEntity<>(headers), UserDetailsImpl.class).getBody();
         Objects.requireNonNull(user);
-        user.setAuthorities(AuthUtil.extractClaimAuthorities(SecurityContextHolder.getContext().getAuthentication()));
+        user.setAuthorities(extractClaimAuthority(jwt));
         return user;
     }
 

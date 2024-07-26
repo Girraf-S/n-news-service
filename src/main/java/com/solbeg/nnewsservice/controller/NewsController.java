@@ -28,7 +28,7 @@ public class NewsController {
         newsService.createNews(newsRequest);
     }
 
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('news:write')")
     public void updateNews(@PathVariable Long id,
                            @RequestBody NewsRequest newsRequest){

@@ -19,6 +19,13 @@ public class UserDetailsImplDeserializer extends JsonDeserializer<UserDetailsImp
         String password = "********";
         boolean active = jsonNode.get("active").asBoolean();
         Set<SimpleGrantedAuthority> authorities = new HashSet<>();
+        if(jsonNode.isArray()){
+            for (JsonNode node:
+                 jsonNode) {
+                authorities.add(new SimpleGrantedAuthority(node.asText()));
+            }
+        }
+
 
         return UserDetailsImpl.builder()
                 .username(username)
